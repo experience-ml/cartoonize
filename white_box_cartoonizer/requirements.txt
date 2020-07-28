@@ -1,7 +1,0 @@
-opencv_python==4.2.0.34
-matplotlib==3.2.1
-tensorflow==1.15.2
-numpy==1.18.1
-Flask 
-gunicorn 
-pillow

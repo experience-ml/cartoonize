@@ -1,3 +1,8 @@
+"""
+Internal code snippets were obtained from https://github.com/SystemErrorWang/White-box-Cartoonization/
+
+For it to work tensorflow version 2.x changes were obtained from https://github.com/steubk/White-box-Cartoonization 
+"""
 import os
 import uuid
 import time
@@ -15,10 +20,10 @@ import network
 import guided_filter
 
 class WB_Cartoonize:
-    def __init__(self, weights_dir):
+    def __init__(self, weights_dir, gpu):
         if not os.path.exists(weights_dir):
             raise FileNotFoundError("Weights Directory not found, check path")
-        self.load_model(weights_dir)
+        self.load_model(weights_dir, gpu)
         print("Weights successfully loaded")
     
     def resize_crop(self, image):
@@ -34,7 +39,7 @@ class WB_Cartoonize:
         image = image[:h, :w, :]
         return image
 
-    def load_model(self, weights_dir):
+    def load_model(self, weights_dir, gpu):
         try:
             tf.disable_eager_execution()
         except:
@@ -51,8 +56,15 @@ class WB_Cartoonize:
         gene_vars = [var for var in all_vars if 'generator' in var.name]
         saver = tf.train.Saver(var_list=gene_vars)
         
-        config = tf.ConfigProto()
-        config.gpu_options.allow_growth = True
+        if gpu:
+            gpu_options = tf.GPUOptions(allow_growth=True)
+            device_count = {'GPU':1}
+        else:
+            gpu_options = None
+            device_count = {'GPU':0}
+        
+        config = tf.ConfigProto(gpu_options=gpu_options, device_count=device_count)
+        
         self.sess = tf.Session(config=config)
 
         self.sess.run(tf.global_variables_initializer())
@@ -73,13 +85,11 @@ class WB_Cartoonize:
         return output
     
     def process_video(self, fname):
-        print("FNAME :", fname)
         ## Capture video using opencv
         cap = cv2.VideoCapture(fname)
 
         target_size = (int(cap.get(3)),int(cap.get(4)))
         output_fname = os.path.abspath('{}/{}-{}.mp4'.format(fname.replace(os.path.basename(fname), ''),str(uuid.uuid4())[:7],os.path.basename(fname).split('.')[0]))
-        print("OUTPUT FNAME: ", output_fname)
         
         ## Generate the processed frames
         processed_frames = []
