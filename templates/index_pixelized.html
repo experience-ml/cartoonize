@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Pixelizer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.3/dist/semantic.min.css">
+    <script
+        src="https://code.jquery.com/jquery-3.1.1.min.js"
+        integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+        crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.3/dist/semantic.min.js"></script>
+    <style>
+        body{
+            background-color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div style="height:10%; display:flex; align-items: center; justify-content: center">
+                    {% for category, message in messages %}
+                        {% if category == error%}
+                            <h3 style="color:red">{{ message }}</h3>
+                        {% else %}
+                            <h3 style="color:green">{{ message }}</h3>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+<div style="height:20%; display: flex; align-items: center; justify-content: center">
+    <!-- <form id='formsubmit' method="post" action="pixelize" enctype = "multipart/form-data"> -->
+    <form id='formsubmit' method="post" action="cartoonize" enctype = "multipart/form-data">
+    
+        <div id='uploadfile' class="ui button" style="align-items: center;">
+            <i class="upload icon"></i>
+            Upload image
+        </div>
+        <input id='hiddeninputfile' type='file' name = 'image' style="display: none"/>
+        <!-- <input id='submitbutton' class='ui button' type='submit'/> -->
+    </form>
+</div>
+{%if original_img%}
+ <br><br>
+    <div class="ui three column grid">
+    {% for pixelized_img, pixels in data%}
+    <div class="column">
+        <div class="ui fluid card">
+        <div class="image">
+            <img src="{{ pixelized_img }}">
+        </div>
+        <div class="content">
+            <a class="header">{{pixels}} X {{pixels}}</a>
+        </div>
+        </div>
+    </div>
+    {%endfor%}
+    </div>
+ {%endif%}
+<script>
+    $("#uploadfile").on("click", function() {
+        $('#hiddeninputfile').click(); 
+    });
+
+    document.getElementById("hiddeninputfile").onchange = function() {
+        document.getElementById("formsubmit").submit();
+    };
+</script> 
+</body>
+</html>
