@@ -23,6 +23,8 @@ export GOOGLE_APPLICATION_CREDENTIALS="/path/to/token.json"
 
 
 ### Algorithmia
+We used the Serveless AI Layer product of [Algorithmia](https://algorithmia.com/serverless-ai-layer) for inference on videos.
+To learn more on how to deploy your model in Algorithmia, check here - https://algorithmia.com/developers
 
 ## Installation
 
