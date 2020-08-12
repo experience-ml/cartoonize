@@ -16,16 +16,7 @@ RUN apt-get update && apt-get install -y \
     libxrender-dev \
     ffmpeg
 # Install production dependencies.
-RUN pip install Flask \
-                gunicorn \
-                pillow \
-                opencv_python==4.2.0.34 \
-                matplotlib==3.2.1 \
-                tensorflow==1.15.2 \
-                numpy==1.18.1 \
-                google-cloud-storage==1.29.0 \
-                algorithmia==1.3.0 \
-                scikit-video==1.1.11
+RUN pip install -r requirements.txt
 
 # Run the web service on container startup. Here we use the gunicorn
 # webserver, with one worker process and 8 threads.
