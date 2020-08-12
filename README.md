@@ -3,6 +3,7 @@
 > Convert images and videos into a cartoon!
 
 The webapp is deployed here - https://cartoonize-lkqov62dia-de.a.run.app
+<div style="text-align:center"><img height="100" alt="Powered by Algorithmia" style="border-width:0" src="static/sample_images/algorithmia.jpeg" /></div>
 
 ## Prerequisites for Google Cloud and Algorithmia
 
