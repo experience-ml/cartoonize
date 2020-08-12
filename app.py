@@ -31,7 +31,6 @@ app = Flask(__name__)
 
 app.config['UPLOAD_FOLDER_VIDEOS'] = 'static/uploaded_videos'
 app.config['CARTOONIZED_FOLDER'] = 'static/cartoonized_images'
-app.secret_key = b'casualbakarwadi'
 
 app.config['OPTS'] = opts
 
