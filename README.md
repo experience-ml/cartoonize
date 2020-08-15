@@ -5,6 +5,8 @@
 The webapp is deployed here - https://cartoonize-lkqov62dia-de.a.run.app
 <div style="text-align:center"><img height="100" alt="Powered by Algorithmia" style="border-width:0" src="static/sample_images/algorithmia.jpeg" /></div>
 
+You can find a writeup on this webapp's architecture [here](https://medium.com/@Niraj_pandkar/how-we-built-an-inexpensive-scalable-architecture-to-cartoonize-the-world-8610050f90a0)!
+
 ## Prerequisites for Google Cloud and Algorithmia
 
 **These are important steps if you want to leverage Google buckets, signed URLs and Algorithmia's platform.**
