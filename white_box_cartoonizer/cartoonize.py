@@ -7,6 +7,7 @@ import os
 import uuid
 import time
 import subprocess
+import sys
 
 import cv2
 import numpy as np
@@ -126,8 +127,11 @@ class WB_Cartoonize:
         return final_name    
 
 if __name__ == '__main__':
-    wbc = WB_Cartoonize(os.path.abspath('./saved_models'))
-    cartoon_image = wbc.infer(os.path.abspath('./test.jpg'))
+    gpu = len(sys.argv) < 2 or sys.argv[1] != '--cpu'
+    wbc = WB_Cartoonize(os.path.abspath('white_box_cartoonizer/saved_models'), gpu)
+    img = cv2.imread('white_box_cartoonizer/test.jpg')
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    cartoon_image = wbc.infer(img)
     import matplotlib.pyplot as plt
     plt.imshow(cartoon_image)
     plt.show()
