@@ -71,6 +71,27 @@ pip install -r requirements.txt
 python app.py
 ```
 
+### Using [Google Colab](https://colab.research.google.com/)
+1. Clone the repository using either of the below mentioned way:
+   - Using Command:
+        - Create a new Notebook in Colab and in the cell execute the below command.  
+        
+        ```
+         ! git clone https://github.com/experience-ml/cartoonize.git
+        ```
+        **Note:** Don't forget to add `!` at the beginning of the command
+        
+    - From Colab User Interface
+ ```
+        Open Colab
+            └── File
+                 └── Open Notebook
+                          └── Github
+                                └── paste the Url of the repository
+ ```
+2. 
+
+
 ## Sample Image and Video
 
 ### Emma Watson Cartoonized
