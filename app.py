@@ -116,7 +116,10 @@ def cartoonize():
                 #change the variable value to change the time_limit of video (In Seconds)
                 time_limit = 10
                 os.system("ffmpeg -hide_banner -loglevel warning -ss 0 -i '{}' -t {} -filter:v scale={}:-2 -r 15 -c:a copy '{}'".format(os.path.abspath(original_video_path), time_limit, width_resize, os.path.abspath(modified_video_path)))
-                
+                #Note: You can also remove the -t parameter to process the full video
+				#use below code to process the full video
+                #os.system("ffmpeg -hide_banner -loglevel warning -ss 0 -i '{}' -filter:v scale={}:-2 -r 15 -c:a copy '{}'".format(os.path.abspath(original_video_path), width_resize, os.path.abspath(modified_video_path)))
+
                 if opts["run_local"]:
                     # if local then "output_uri" is a file path
                     output_uri = wb_cartoonizer.process_video(modified_video_path)
