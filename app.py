@@ -16,7 +16,7 @@ import flask
 from PIL import Image
 import numpy as np
 #uncomment only if you are using google colab 
-from flask_ngrok import run_with_ngrok #to run the application on colab using ngrok
+#from flask_ngrok import run_with_ngrok #to run the application on colab using ngrok
 
 
 from cartoonize import WB_Cartoonize
@@ -32,7 +32,7 @@ if not opts['run_local']:
 
 app = Flask(__name__)
 # Uncomment only if you want to run the application on colab
-run_with_ngrok(app)   #starts ngrok when the app is run
+#run_with_ngrok(app)   #starts ngrok when the app is run
 
 app.config['UPLOAD_FOLDER_VIDEOS'] = 'static/uploaded_videos'
 app.config['CARTOONIZED_FOLDER'] = 'static/cartoonized_images'
@@ -148,6 +148,6 @@ def cartoonize():
 
 if __name__ == "__main__":
     # Commemnt the below line to run the Appication on Google Colab using ngrok
-    #app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
+    app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
     # Uncomment the below line to run the Appication on Google Colab using ngrok
-    app.run()
+    #app.run()
