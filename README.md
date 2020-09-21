@@ -89,7 +89,54 @@ python app.py
                           └── Github
                                 └── paste the Url of the repository
  ```
-2. 
+ Note : Change the runtime to GPU before running the application
+ ```
+            Runtime
+               └── Change runtime type
+                           └── Select GPU
+ ```
+2. After cloning the repository navigate to the `/cartoonize` using below command in the notebook cell:
+
+```
+%cd cartoonize
+```
+3. Run the below code in cell to install the `ngrok` for creating the url to access the application:
+
+```
+!pip install flask-ngrok
+```
+
+4. In `/app.py` Add the following code:
+
+   Import the ngrok:
+
+   ```
+   from flask_ngrok import run_with_ngrok
+   ```
+
+   After app variable add the following command at line 31: 
+   ```
+   run_with_ngrok(app)   #starts ngrok when the app is run
+   ```
+
+   Change the app.run() to the below format:
+
+   ```
+   app.run() #remove the passed parameter 
+   ```
+5. Run the below commands in the notebook cell :
+
+   Install the requirements 
+
+   ```
+   !pip install -r requirements.txt
+   ```
+
+   Launch the flask app on ngrok
+   ```
+   !python app.py
+   ```
+
 
 
 ## Sample Image and Video
