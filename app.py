@@ -15,6 +15,9 @@ from flask import Flask, render_template, make_response, flash
 import flask
 from PIL import Image
 import numpy as np
+#uncomment only if you are using google colab 
+#from flask_ngrok import run_with_ngrok #to run the application on colab using ngrok
+
 
 from cartoonize import WB_Cartoonize
 
@@ -28,6 +31,8 @@ if not opts['run_local']:
     import Algorithmia
 
 app = Flask(__name__)
+# Uncomment only if you want to run the application on colab
+#run_with_ngrok(app)   #starts ngrok when the app is run
 
 app.config['UPLOAD_FOLDER_VIDEOS'] = 'static/uploaded_videos'
 app.config['CARTOONIZED_FOLDER'] = 'static/cartoonized_images'
@@ -97,9 +102,24 @@ def cartoonize():
                 
                 # Slice, Resize and Convert Video to 15fps
                 modified_video_path = os.path.join(app.config['UPLOAD_FOLDER_VIDEOS'], filename.split(".")[0] + "_modified.mp4")
+                #change the size if you want higher resolution :
+                ############################
+                # Recommnded width_resize  #
+                ############################
+                #width_resize = 1920 for 1080p: 1920x1080.
+                #width_resize = 1280 for 720p: 1280x720.
+                #width_resize = 854 for 480p: 854x480.
+                #width_resize = 640 for 360p: 640x360.
+                #width_resize = 426 for 240p: 426x240.
                 width_resize=480
-                os.system("ffmpeg -hide_banner -loglevel warning -ss 0 -i '{}' -t 10 -filter:v scale={}:-2 -r 15 -c:a copy '{}'".format(os.path.abspath(original_video_path), width_resize, os.path.abspath(modified_video_path)))
-                
+
+                #change the variable value to change the time_limit of video (In Seconds)
+                time_limit = 10
+                os.system("ffmpeg -hide_banner -loglevel warning -ss 0 -i '{}' -t {} -filter:v scale={}:-2 -r 15 -c:a copy '{}'".format(os.path.abspath(original_video_path), time_limit, width_resize, os.path.abspath(modified_video_path)))
+                #Note: You can also remove the -t parameter to process the full video
+				#use below code to process the full video
+                #os.system("ffmpeg -hide_banner -loglevel warning -ss 0 -i '{}' -filter:v scale={}:-2 -r 15 -c:a copy '{}'".format(os.path.abspath(original_video_path), width_resize, os.path.abspath(modified_video_path)))
+
                 if opts["run_local"]:
                     # if local then "output_uri" is a file path
                     output_uri = wb_cartoonizer.process_video(modified_video_path)
@@ -130,4 +150,7 @@ def cartoonize():
         return render_template("index_cartoonized.html")
 
 if __name__ == "__main__":
+    # Commemnt the below line to run the Appication on Google Colab using ngrok
     app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
+    # Uncomment the below line to run the Appication on Google Colab using ngrok
+    #app.run()

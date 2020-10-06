@@ -71,6 +71,74 @@ pip install -r requirements.txt
 python app.py
 ```
 
+### Using [Google Colab](https://colab.research.google.com/)
+1. Clone the repository using either of the below mentioned way:
+   - Using Command:
+        - Create a new Notebook in Colab and in the cell execute the below command.  
+        
+        ```
+         ! git clone https://github.com/experience-ml/cartoonize.git
+        ```
+        **Note:** Don't forget to add `!` at the beginning of the command
+        
+    - From Colab User Interface
+ ```
+        Open Colab
+            └── File
+                 └── Open Notebook
+                          └── Github
+                                └── paste the Url of the repository
+ ```
+ Note : Change the runtime to GPU before running the application
+ ```
+            Runtime
+               └── Change runtime type
+                           └── Select GPU
+ ```
+2. After cloning the repository navigate to the `/cartoonize` using below command in the notebook cell:
+
+```
+%cd cartoonize
+```
+3. Run the below code in cell to install the `ngrok` for creating the url to access the application:
+
+```
+!pip install flask-ngrok
+```
+
+4. In `/app.py` Add the following code:
+
+   Import the ngrok:
+
+   ```
+   from flask_ngrok import run_with_ngrok
+   ```
+
+   After app variable add the following command at line 31: 
+   ```
+   run_with_ngrok(app)   #starts ngrok when the app is run
+   ```
+
+   Change the app.run() to the below format:
+
+   ```
+   app.run() #remove the passed parameter 
+   ```
+5. Run the below commands in the notebook cell :
+
+   Install the requirements 
+
+   ```
+   !pip install -r requirements.txt
+   ```
+
+   Launch the flask app on ngrok
+   ```
+   !python app.py
+   ```
+#### Note : Sample [Google Colab Notebook](https://colab.research.google.com/drive/1Dwtsai_Vam_f1mUQlvxUn-T0NNmWH6e8?usp=sharing) for reference
+
+
 ## Sample Image and Video
 
 ### Emma Watson Cartoonized
