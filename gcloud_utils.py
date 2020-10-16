@@ -49,6 +49,15 @@ def delete_blob(bucket_name, blob_name):
 
     print("Blob {} deleted.".format(blob_name))
 
+def download_video(bucket_name, filename, output_filename):
+    bucket = client.get_bucket(bucket_name)
+    # Create a blob object from the filepath
+    blob = bucket.blob(filename)
+    # Download the file to a destination
+    blob.download_to_filename(output_filename)
+
+    return output_filename
+
 def generate_signed_url(output_uri):
     expiration_time = datetime.timedelta(minutes=5)
 

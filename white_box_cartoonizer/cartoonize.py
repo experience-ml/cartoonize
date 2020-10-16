@@ -85,38 +85,32 @@ class WB_Cartoonize:
         
         return output
     
-    def process_video(self, fname):
+    def process_video(self, fname, frame_rate):
         ## Capture video using opencv
         cap = cv2.VideoCapture(fname)
 
         target_size = (int(cap.get(3)),int(cap.get(4)))
         output_fname = os.path.abspath('{}/{}-{}.mp4'.format(fname.replace(os.path.basename(fname), ''),str(uuid.uuid4())[:7],os.path.basename(fname).split('.')[0]))
-        
-        ## Generate the processed frames
-        processed_frames = []
-        timings = []
+
+        out = skvideo.io.FFmpegWriter(output_fname, inputdict={'-r':frame_rate}, outputdict={'-r':frame_rate})
 
         while True:
             ret, frame = cap.read()
             
             if ret:
+                
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 
-                #st = time.time()
                 frame = self.infer(frame)
-                #timings.append(time.time()-st)
                 
                 frame = cv2.resize(frame, target_size)
                 
-                processed_frames.append(frame)
+                out.writeFrame(frame)
                 
             else:
                 break
         cap.release()
-        
-        st = time.time()
-        skvideo.io.vwrite(output_fname, np.stack(processed_frames), inputdict={'-r':'15/1'}, outputdict={'-r':'15/1'}, verbosity=1)
-        sk_vid_time = time.time() - st
+        out.close()
         
         final_name = '{}final_{}'.format(fname.replace(os.path.basename(fname), ''), os.path.basename(output_fname))
 
@@ -124,7 +118,9 @@ class WB_Cartoonize:
         p.communicate()
         p.wait()
 
-        return final_name    
+        os.system("rm "+output_fname)
+
+        return final_name
 
 if __name__ == '__main__':
     gpu = len(sys.argv) < 2 or sys.argv[1] != '--cpu'
