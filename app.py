@@ -15,15 +15,16 @@ from flask import Flask, render_template, make_response, flash
 import flask
 from PIL import Image
 import numpy as np
-#uncomment only if you are using google colab 
-#from flask_ngrok import run_with_ngrok #to run the application on colab using ngrok
+import skvideo.io
+if opts['colab-mode']:
+    from flask_ngrok import run_with_ngrok #to run the application on colab using ngrok
 
 
 from cartoonize import WB_Cartoonize
 
 if not opts['run_local']:
     if 'GOOGLE_APPLICATION_CREDENTIALS' in os.environ:
-        from gcloud_utils import upload_blob, generate_signed_url, delete_blob
+        from gcloud_utils import upload_blob, generate_signed_url, delete_blob, download_video
     else:
         raise Exception("GOOGLE_APPLICATION_CREDENTIALS not set in environment variables")
     from video_api import api_request
@@ -31,8 +32,8 @@ if not opts['run_local']:
     import Algorithmia
 
 app = Flask(__name__)
-# Uncomment only if you want to run the application on colab
-#run_with_ngrok(app)   #starts ngrok when the app is run
+if opts['colab-mode']:
+    run_with_ngrok(app)   #starts ngrok when the app is run
 
 app.config['UPLOAD_FOLDER_VIDEOS'] = 'static/uploaded_videos'
 app.config['CARTOONIZED_FOLDER'] = 'static/cartoonized_images'
@@ -100,8 +101,22 @@ def cartoonize():
                 original_video_path = os.path.join(app.config['UPLOAD_FOLDER_VIDEOS'], filename)
                 video.save(original_video_path)
                 
-                # Slice, Resize and Convert Video to 15fps
                 modified_video_path = os.path.join(app.config['UPLOAD_FOLDER_VIDEOS'], filename.split(".")[0] + "_modified.mp4")
+                
+                ## Fetch Metadata and set frame rate
+                file_metadata = skvideo.io.ffprobe(original_video_path)
+                original_frame_rate = None
+                if 'video' in file_metadata:
+                    if '@r_frame_rate' in file_metadata['video']:
+                        original_frame_rate = file_metadata['video']['@r_frame_rate']
+
+                if opts['original_frame_rate']:
+                    output_frame_rate = original_frame_rate
+                else:
+                    output_frame_rate = opts['output_frame_rate']    
+
+                output_frame_rate_number = int(output_frame_rate.split('/')[0])
+
                 #change the size if you want higher resolution :
                 ############################
                 # Recommnded width_resize  #
@@ -111,38 +126,44 @@ def cartoonize():
                 #width_resize = 854 for 480p: 854x480.
                 #width_resize = 640 for 360p: 640x360.
                 #width_resize = 426 for 240p: 426x240.
-                width_resize=480
+                width_resize=opts['resize-dim']
 
-                #change the variable value to change the time_limit of video (In Seconds)
-                time_limit = 10
-                os.system("ffmpeg -hide_banner -loglevel warning -ss 0 -i '{}' -t {} -filter:v scale={}:-2 -r 15 -c:a copy '{}'".format(os.path.abspath(original_video_path), time_limit, width_resize, os.path.abspath(modified_video_path)))
-                #Note: You can also remove the -t parameter to process the full video
-				#use below code to process the full video
-                #os.system("ffmpeg -hide_banner -loglevel warning -ss 0 -i '{}' -filter:v scale={}:-2 -r 15 -c:a copy '{}'".format(os.path.abspath(original_video_path), width_resize, os.path.abspath(modified_video_path)))
+                # Slice, Resize and Convert Video as per settings
+                if opts['trim-video']:
+                    #change the variable value to change the time_limit of video (In Seconds)
+                    time_limit = opts['trim-video-length']
+                    if opts['original_resolution']:
+                        os.system("ffmpeg -hide_banner -loglevel warning -ss 0 -i '{}' -t {} -filter:v scale=-1:-2 -r {} -c:a copy '{}'".format(os.path.abspath(original_video_path), time_limit, output_frame_rate_number, os.path.abspath(modified_video_path)))
+                    else:
+                        os.system("ffmpeg -hide_banner -loglevel warning -ss 0 -i '{}' -t {} -filter:v scale={}:-2 -r {} -c:a copy '{}'".format(os.path.abspath(original_video_path), time_limit, width_resize, output_frame_rate_number, os.path.abspath(modified_video_path)))
+                else:
+                    if opts['original_resolution']:
+                       os.system("ffmpeg -hide_banner -loglevel warning -ss 0 -i '{}' -filter:v scale=-1:-2 -r {} -c:a copy '{}'".format(os.path.abspath(original_video_path), output_frame_rate_number, os.path.abspath(modified_video_path)))
+                    else:
+                        os.system("ffmpeg -hide_banner -loglevel warning -ss 0 -i '{}' -filter:v scale={}:-2 -r {} -c:a copy '{}'".format(os.path.abspath(original_video_path), width_resize, output_frame_rate_number, os.path.abspath(modified_video_path)))
+                
+                audio_file_path = os.path.join(app.config['UPLOAD_FOLDER_VIDEOS'], filename.split(".")[0] + "_audio_modified.mp4")
+                os.system("ffmpeg -hide_banner -loglevel warning -i '{}' -map 0:1 -vn -acodec copy -strict -2  '{}'".format(os.path.abspath(modified_video_path), os.path.abspath(audio_file_path)))
 
                 if opts["run_local"]:
-                    # if local then "output_uri" is a file path
-                    output_uri = wb_cartoonizer.process_video(modified_video_path)
+                    cartoon_video_path = wb_cartoonizer.process_video(modified_video_path, output_frame_rate)
                 else:
                     data_uri = upload_blob("processed_videos_cartoonize", modified_video_path, filename, content_type='video/mp4', algo_unique_key='cartoonizeinput')
                     response = api_request(data_uri)
-
                     # Delete the processed video from Cloud storage
                     delete_blob("processed_videos_cartoonize", filename)
-                    output_uri = response['output_uri']
+                    cartoon_video_path = download_video('cartoonized_videos', os.path.basename(response['output_uri']), os.path.join(app.config['UPLOAD_FOLDER_VIDEOS'], filename.split(".")[0] + "_cartoon.mp4"))
                 
-                # Delete the videos from local disk
-                os.system("rm " + original_video_path) 
-                os.system("rm " + modified_video_path)
-                
-                if opts["run_local"]:
-                    signed_url = output_uri
-                else:
-                    signed_url = generate_signed_url(output_uri)
+                ## Add audio to the cartoonized video
+                final_cartoon_video_path = os.path.join(app.config['UPLOAD_FOLDER_VIDEOS'], filename.split(".")[0] + "_cartoon_audio.mp4")
+                os.system("ffmpeg -hide_banner -loglevel warning -i '{}' -i '{}' -codec copy -shortest '{}'".format(os.path.abspath(cartoon_video_path), os.path.abspath(audio_file_path), os.path.abspath(final_cartoon_video_path)))
 
-                return render_template("index_cartoonized.html", cartoonized_video=signed_url)
+                # Delete the videos from local disk
+                os.system("rm {} {} {} {}".format(original_video_path, modified_video_path, audio_file_path, cartoon_video_path))
+
+                return render_template("index_cartoonized.html", cartoonized_video=final_cartoon_video_path)
         
-        except Exception as e:
+        except Exception:
             print(traceback.print_exc())
             flash("Our server hiccuped :/ Please upload another file! :)")
             return render_template("index_cartoonized.html")
@@ -151,6 +172,7 @@ def cartoonize():
 
 if __name__ == "__main__":
     # Commemnt the below line to run the Appication on Google Colab using ngrok
-    app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
-    # Uncomment the below line to run the Appication on Google Colab using ngrok
-    #app.run()
+    if opts['colab-mode']:
+        app.run()
+    else:
+        app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
