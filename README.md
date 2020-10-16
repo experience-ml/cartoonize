@@ -10,21 +10,13 @@ You can find a writeup on this webapp's architecture [here](https://medium.com/@
 ---
 
 ## Contents
-- [Cartoonizer](#cartoonizer)
-  - [Contents](#contents)
-  - [Prerequisites for Google Cloud and Algorithmia](#prerequisites-for-google-cloud-and-algorithmia)
-    - [Cloud Run authentication](#cloud-run-authentication)
-    - [Algorithmia](#algorithmia)
-  - [Installation](#installation)
-    - [Application tested on:](#application-tested-on)
-    - [Using Docker](#using-docker)
-    - [Using `virtualenv`](#using-virtualenv)
-    - [Using Google Colab](#using-google-colab)
-      - [Note : Sample Google Colab Notebook for reference](#note--sample-google-colab-notebook-for-reference)
-  - [Sample Image and Video](#sample-image-and-video)
-    - [Emma Watson Cartoonized](#emma-watson-cartoonized)
-    - [Youtube Video of Avenger's Bar Scene Cartoonized](#youtube-video-of-avengers-bar-scene-cartoonized)
-  - [License](#license)
+
+- [Prerequisites for Google Cloud and Algorithmia](#prerequisites-for-google-cloud-and-algorithmia)
+- [Installation](#installation)
+  - [Docker](#using-docker)
+  - [VirtualEnv](#using-virtualenv)
+  - [Google Colab](#using-google-colab)
+- [Sample Image and Video](#sample-image-and-video)
 
 ---
 
