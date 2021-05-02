@@ -5,6 +5,6 @@ trim-video: true #Set this to false if you want to process full video
 trim-video-length: 15 #Max number of seconds you want to trim the video from start
 original_frame_rate: false #If False output_frame_rate will be used else original video detected frame rate will be used, if no metadata found will use output_frame_rate  
 output_frame_rate: '24/1' #Set the output frame rate, if original resolution
-colab-mode: false #Set true if you are executing in colab mode
+colab-mode: true #Set true if you are executing in colab mode
 original_resolution: false # Set to true if you don't want to resize the original video
 resize-dim: 720 #The width of the video will be resized to specified number maintaining aspect ratio
