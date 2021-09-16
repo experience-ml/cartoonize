@@ -1,6 +1,7 @@
 # Use the official lightweight Python image.
 # https://hub.docker.com/_/python
-FROM python:3.7-slim
+# FROM python:3.7-slim
+FROM tensorflow/tensorflow:2.1.0-gpu-py3
 
 # Copy local code to the container image.
 ENV APP_HOME /app
@@ -9,12 +10,13 @@ COPY . ./
 
 ENV GOOGLE_APPLICATION_CREDENTIALS "./token.json"
 
-RUN apt-get update && apt-get install -y \
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender-dev \
-    ffmpeg
+RUN apt-get update && apt-get install -y ffmpeg python3-opencv
+# RUN apt-get update && apt-get install -y \
+#     libglib2.0-0 \
+#     libsm6 \
+#     libxext6 \
+#     libxrender-dev \
+#     ffmpeg
 # Install production dependencies.
 RUN pip install -r requirements.txt
 
@@ -22,4 +24,4 @@ RUN pip install -r requirements.txt
 # webserver, with one worker process and 8 threads.
 # For environments with multiple CPU cores, increase the number of workers
 # to be equal to the cores available.
-CMD exec gunicorn --bind 0.0.0.0:8080 --workers 1 --threads 8 --timeout 0 app:app
+# CMD exec gunicorn --bind 0.0.0.0:8080 --workers 1 --threads 8 --timeout 0 app:app

@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+  Cartoonizer:
+    build:
+      context: .
+      dockerfile: CartoonizerDockerfile
+    image: cartoonize
+    # if you need bind mount
+    # volumes:
+    #   - ".:/app"
+    ports:
+      - 8080:8080
+      
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+              device_ids: ["0"]
+
+    entrypoint: ["python", "app.py"]
