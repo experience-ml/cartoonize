@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  web:
+    container_name: cartoonize_compose
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    # image: .
+    restart: always
+    ports:
+      - "8000:8080"
+    volumes:
+      - .:/app
